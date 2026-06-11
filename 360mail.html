@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-89NN1P6CEV"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-89NN1P6CEV');</script>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>360 — Mail</title>
+  <link rel="manifest" href="/manifest.json"/>
+  <meta name="theme-color" content="#3b82f6"/>
+  <link rel="icon" type="image/png" href="/favicon-32x32.png"/>
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+  <link rel="stylesheet" href="/assets/css/main.css"/>
+  <link rel="stylesheet" href="/assets/css/wide.css"/>
+  <link rel="stylesheet" href="/assets/css/cursor.css"/>
+  <link rel="stylesheet" href="/assets/css/responsive.css"/>
+  <link rel="stylesheet" href="/assets/css/mail.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+  <div class="cursor-dot"></div>
+  <div class="cursor-trail"></div>
+  <div class="cursor-crosshair"></div>
+  <div class="cursor-blob"></div>
+
+  <button class="sidebar-toggle" id="sidebarToggle">☰ Menu</button>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-mark"></div>
+      <button id="settingsBtn">⚙</button>
+    </div>
+    <nav class="nav-list">
+      <div class="nav-item" data-href="/">Home</div>
+      <div class="nav-item" data-href="/ai">AI</div>
+      <div class="nav-item" data-href="/weather">Weather</div>
+      <div class="nav-item" data-href="/translator">Translator</div>
+      <div class="nav-item" data-href="/stocks">Stocks</div>
+      <div class="nav-item" data-href="/url-shortener">URL Shortener</div>
+      <div class="nav-item" data-href="/chat">Chat</div>
+      <div class="nav-item" data-href="/news">News</div>
+      <div class="nav-item" data-href="/apps">Apps</div>
+      <div class="nav-item" data-href="/games">Games</div>
+      <div class="nav-item active" data-href="/360mail">360Mail</div>
+    </nav>
+    <div class="sidebar-footer"><span id="sidebar-ver">Loading...</span></div>
+  </aside>
+
+  <div class="overlay" id="overlay"></div>
+
+  <div class="settings-panel" id="settingsPanel">
+    <h3>Appearance</h3>
+    <div class="settings-label">Theme</div>
+    <div class="theme-swatches">
+      <div class="theme-option"><div class="swatch" data-theme="ocean"></div><span>Ocean</span></div>
+      <div class="theme-option"><div class="swatch" data-theme="midnight"></div><span>Midnight</span></div>
+      <div class="theme-option"><div class="swatch" data-theme="sunset"></div><span>Sunset</span></div>
+      <div class="theme-option"><div class="swatch" data-theme="mint"></div><span>Mint</span></div>
+      <div class="theme-option"><div class="swatch" data-theme="neon"></div><span>Neon</span></div>
+      <div class="theme-option"><div class="swatch" data-theme="mono"></div><span>Mono</span></div>
+    </div>
+    <div class="settings-label" style="margin-top:20px;">Mode</div>
+    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+      <span style="font-size:14px;">Dark mode</span>
+      <input type="checkbox" id="darkToggle"/>
+    </label>
+    <h3 style="margin-top:20px;">Cursor</h3>
+    <div class="settings-label">Style</div>
+    <div class="cursor-options">
+      <div class="cursor-option active" data-cursor="default"><div class="cursor-preview preview-default"></div>Default</div>
+      <div class="cursor-option" data-cursor="dot"><div class="cursor-preview preview-dot"></div>Dot</div>
+      <div class="cursor-option" data-cursor="ring"><div class="cursor-preview preview-ring"></div>Ring</div>
+      <div class="cursor-option" data-cursor="crosshair"><div class="cursor-preview preview-crosshair"></div>Crosshair</div>
+      <div class="cursor-option" data-cursor="blob"><div class="cursor-preview preview-blob"></div>Blob</div>
+      <div class="cursor-option" data-cursor="system"><div class="cursor-preview preview-system"></div>System</div>
+    </div>
+    <div class="cursor-color-row">
+      <label>Cursor color</label>
+      <input type="color" id="cursorColorPicker" value="#3b82f6"/>
+      <button id="cursorColorReset">Reset</button>
+    </div>
+    <div class="temp-unit-box" style="margin-top:20px;">
+      Temp Unit: <span id="tempUnitLabel">°C</span>
+      <button id="tempUnitBtn">Switch</button>
+    </div>
+    <div class="settings-box" style="margin-top:20px;">
+      <div class="settings-label">Background Image</div>
+      <input type="file" id="bgUpload" accept="image/*" class="settings-input"/>
+      <input type="text" id="bgUrlInput" placeholder="Paste image URL…" class="settings-input"/>
+      <button id="bgUrlBtn" class="settings-btn">Apply URL</button>
+      <button id="bgResetBtn" class="settings-btn">Reset</button>
+    </div>
+    <h3 style="margin-top:25px;">Legal</h3>
+    <a href="/privacypolicy" class="legal-link">🔒 Privacy Policy</a>
+    <a href="/tos" class="legal-link">📜 Terms of Service</a>
+    <h3 style="margin-top:25px;">About</h3>
+    <details class="about-dropdown">
+      <summary>ℹ️ What is 360?</summary>
+      <p>360 is a next-generation search engine and digital workspace. Built by 360 Digital, Co.</p>
+    </details>
+  </div>
+
+  <div class="auth-top-right">
+    <button id="signInBtn" class="auth-btn">Sign In</button>
+    <button id="signUpBtn" class="auth-btn">Sign Up</button>
+    <button id="signOutBtn" class="auth-btn" style="display:none;">Sign Out</button>
+  </div>
+
+  <button id="installBtn" class="install-banner" style="display:none;">Install 360</button>
+
+  <!-- ── GATE ── -->
+  <div class="mail-gate" id="mailGate" style="display:none;">
+    <div class="mail-gate-icon">✉️</div>
+    <div class="mail-gate-title">360Mail</div>
+    <div class="mail-gate-sub">Sign in to access your @360-search.com inbox.</div>
+    <button class="mail-gate-btn" onclick="location.href='/account?signin&from=/360mail'">Sign In</button>
+  </div>
+
+  <!-- ── MAIN APP ── -->
+  <div class="mail-root" id="mailApp" style="display:none;">
+
+    <!-- Left sidebar -->
+    <div class="mail-left" id="mailLeft">
+      <button class="mail-compose-btn" id="composeBtn"><span>✏</span><span>Compose</span></button>
+
+      <div class="folder-label">Mailbox</div>
+      <div class="folder-item active" data-folder="inbox" data-builtin="1">
+        <span class="fi-icon">📩</span><span class="fi-name">Inbox</span>
+        <button class="folder-reload-btn" title="Reload">↻</button>
+        <span class="folder-badge" id="inboxBadge" style="display:none;"></span>
+      </div>
+      <div class="folder-item" data-folder="sent" data-builtin="1">
+        <span class="fi-icon">📨</span><span class="fi-name">Sent</span>
+        <button class="folder-reload-btn" title="Reload">↻</button>
+      </div>
+      <div class="folder-item" data-folder="starred" data-builtin="1">
+        <span class="fi-icon">⭐</span><span class="fi-name">Starred</span>
+        <button class="folder-reload-btn" title="Reload">↻</button>
+      </div>
+
+      <div class="folder-label" id="customFolderLabel" style="display:none;">
+        Categories
+        <button class="folder-add-btn" id="addCategoryBtn" title="Add category">＋</button>
+      </div>
+      <div class="folder-label" id="customFolderLabelShow" style="display:none;">
+        <!-- shown when categories exist, has the + button -->
+      </div>
+      <!-- custom category items injected here -->
+      <div id="customFolderList"></div>
+
+      <!-- Always-visible + button below built-in folders when no categories yet -->
+      <div style="padding:4px 8px 0;">
+        <button class="folder-item" id="addCategoryBtnAlt" style="width:calc(100% - 0px);justify-content:center;gap:6px;background:none;border:1px dashed var(--glass-border-strong);color:var(--mut);font-size:12px;margin:4px 0;">
+          <span>＋</span><span class="fi-name" style="flex:unset;">New Category</span>
+        </button>
+      </div>
+
+      <div class="mail-address-pill" id="myAddressPill">Loading…</div>
+    </div>
+
+    <!-- Middle: list -->
+    <div class="mail-list-panel" id="mailListPanel">
+      <div class="mail-list-header">
+        <div class="mail-list-title" id="listTitle">Inbox</div>
+        <div class="mail-list-count" id="listCount">0</div>
+        <button class="mail-list-reload" id="listReloadBtn" title="Reload">↻</button>
+      </div>
+      <div class="mail-search-bar">
+        <input type="text" id="mailSearch" placeholder="Search mail…"/>
+      </div>
+      <div class="mail-list-scroll" id="mailListScroll">
+        <div id="mailSkeletons">
+          <div class="mail-skeleton"><div class="sk-line" style="width:60%"></div><div class="sk-line" style="width:85%"></div><div class="sk-line" style="width:45%"></div></div>
+          <div class="mail-skeleton"><div class="sk-line" style="width:55%"></div><div class="sk-line" style="width:78%"></div><div class="sk-line" style="width:50%"></div></div>
+          <div class="mail-skeleton"><div class="sk-line" style="width:70%"></div><div class="sk-line" style="width:88%"></div><div class="sk-line" style="width:40%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: reading pane -->
+    <div class="mail-read-pane" id="mailReadPane">
+      <div class="mail-no-select" id="noMailSelected">
+        <div class="mail-no-select-icon">✉️</div>
+        <div class="mail-no-select-text">Select a message to read</div>
+      </div>
+      <div id="mailReadContent" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+        <div class="mail-read-header">
+          <div class="mrh-subject" id="rdSubject"></div>
+          <div class="mrh-meta">
+            <div class="mrh-from" id="rdFrom"></div>
+            <div class="mrh-addr" id="rdAddr"></div>
+            <div class="mrh-time" id="rdTime"></div>
+          </div>
+        </div>
+        <div class="mail-read-actions">
+          <button class="mra-btn" id="rdReply">↩ Reply</button>
+          <button class="mra-btn" id="rdForward">→ Forward</button>
+          <button class="mra-btn" id="rdStar">☆ Star</button>
+          <button class="mra-btn danger" id="rdDelete">🗑 Delete</button>
+          <button class="mra-btn" id="rdBack" style="display:none;">← Back</button>
+        </div>
+        <div class="mail-read-body" id="rdBody"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── COMPOSE MODAL ── -->
+  <div class="compose-modal" id="composeModal">
+    <div class="compose-box">
+      <div class="compose-header">
+        <span class="compose-title">✏ New Message</span>
+        <button class="compose-close" id="composeClose">✕</button>
+      </div>
+      <div class="compose-fields">
+        <div class="compose-field"><label>To</label><input type="email" id="cTo" placeholder="recipient@example.com"/></div>
+        <div class="compose-field"><label>Subject</label><input type="text" id="cSubject" placeholder="Subject"/></div>
+      </div>
+      <div class="compose-body-wrap"><textarea class="compose-body" id="cBody" placeholder="Write your message…"></textarea></div>
+      <div class="compose-footer">
+        <button class="compose-send-btn" id="cSendBtn"><span>✈</span> Send</button>
+        <span class="compose-status" id="cStatus"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── DELETE CONFIRM ── -->
+  <div class="modal-overlay" id="confirmOverlay">
+    <div class="modal-box" style="text-align:center;">
+      <div class="modal-title" style="text-align:center;">Delete message?</div>
+      <div class="modal-sub">This will permanently remove the message.</div>
+      <div class="modal-actions" style="justify-content:center;">
+        <button class="modal-cancel" id="confirmCancel">Cancel</button>
+        <button class="modal-confirm danger" id="confirmDelete">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── NEW CATEGORY MODAL ── -->
+  <div class="modal-overlay" id="catModal">
+    <div class="modal-box">
+      <div class="modal-title">New Category</div>
+      <div class="cat-form-row">
+        <label>Name</label>
+        <input type="text" id="catName" placeholder="e.g. GitHub, Work, Family"/>
+      </div>
+      <div class="cat-form-row">
+        <label>Color</label>
+        <input type="color" id="catColor" value="#6366f1"/>
+      </div>
+      <div style="font-size:12px;color:var(--mut);margin-bottom:6px;">Sender rules — messages from these addresses are copied to this category:</div>
+      <div class="rule-list" id="ruleList"></div>
+      <div class="rule-add-row">
+        <input type="email" id="ruleInput" placeholder="sender@example.com"/>
+        <button id="ruleAddBtn">＋ Add</button>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-cancel" id="catModalCancel">Cancel</button>
+        <button class="modal-confirm" id="catModalSave">Create</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── EDIT CATEGORY MODAL ── -->
+  <div class="modal-overlay" id="catEditModal">
+    <div class="modal-box">
+      <div class="modal-title">Edit Category</div>
+      <div class="cat-form-row">
+        <label>Name</label>
+        <input type="text" id="catEditName"/>
+      </div>
+      <div class="cat-form-row">
+        <label>Color</label>
+        <input type="color" id="catEditColor"/>
+      </div>
+      <div style="font-size:12px;color:var(--mut);margin-bottom:6px;">Sender rules:</div>
+      <div class="rule-list" id="editRuleList"></div>
+      <div class="rule-add-row">
+        <input type="email" id="editRuleInput" placeholder="sender@example.com"/>
+        <button id="editRuleAddBtn">＋ Add</button>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-cancel" id="catEditCancel">Cancel</button>
+        <button class="modal-confirm danger" id="catEditDelete" style="margin-right:auto;">Delete</button>
+        <button class="modal-confirm" id="catEditSave">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/assets/js/main.js"></script>
+  <script src="/assets/js/wide.js"></script>
+  <script src="/assets/js/cookie.js"></script>
+  <script src="/assets/js/cursor.js"></script>
+
+  <script>
+  (() => {
+    const sb = supabaseClient;
+    const SB_URL  = "https://wiswfpfsjiowtrdyqpxy.supabase.co";
+    const SB_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indpc3dmcGZzamlvd3RyZHlxcHh5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzMzg4OTcsImV4cCI6MjA4MzkxNDg5N30.z_4FtM2c8UwgrRlafPYjolQuod4IoHQats95XHio1zM";
+
+    let user         = null;
+    let mailAddress  = null;   // username@360-search.com — THE canonical mail key
+    let currentFolder= "inbox";
+    let currentCatId = null;   // set when viewing a custom category
+    let allEmails    = [];
+    let filteredEmails=[];
+    let selectedId   = null;
+    let deleteTarget = null;
+    let categories   = [];     // [{id, name, color}]
+    let rules        = {};     // {catId: [senderEmail, ...]}
+    let newCatRules  = [];     // staging for new-category modal
+    let editCatId    = null;
+    let editCatRules = [];
+
+    // ── DOM ──
+    const mailGate    = document.getElementById("mailGate");
+    const mailApp     = document.getElementById("mailApp");
+    const listScroll  = document.getElementById("mailListScroll");
+    const skeletons   = document.getElementById("mailSkeletons");
+    const listTitle   = document.getElementById("listTitle");
+    const listCount   = document.getElementById("listCount");
+    const inboxBadge  = document.getElementById("inboxBadge");
+    const noSelect    = document.getElementById("noMailSelected");
+    const readContent = document.getElementById("mailReadContent");
+    const addrPill    = document.getElementById("myAddressPill");
+    const searchInput = document.getElementById("mailSearch");
+    const composeModal= document.getElementById("composeModal");
+    const customList  = document.getElementById("customFolderList");
+    const rdBack      = document.getElementById("rdBack");
+
+    // ── Boot ──
+    (async () => {
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) { mailGate.style.display = "flex"; return; }
+      user = session.user;
+      await loadProfile();
+      mailApp.style.display = "flex";
+      setupFolderClicks();
+      setupCompose();
+      setupSearch();
+      setupReload();
+      setupCategoryModals();
+      setupRealtime();
+      await loadCategories();
+      await loadMail();
+    })();
+
+    sb.auth.onAuthStateChange((ev, sess) => {
+      if (ev === "SIGNED_OUT") { mailGate.style.display="flex"; mailApp.style.display="none"; }
+    });
+
+    // ── Profile ──
+    async function loadProfile() {
+      const { data: p } = await sb.from("profiles").select("mail_address,username").eq("id", user.id).maybeSingle();
+      mailAddress = p?.mail_address
+        || (p?.username ? p.username.toLowerCase().replace(/\s+/g,"") + "@360-search.com" : null)
+        || user.email;
+      addrPill.textContent = mailAddress || "No address";
+    }
+
+    // ── Load mail ──
+    async function loadMail() {
+      if (!mailAddress) return;
+      skeletons.style.display = "block";
+      const { data, error } = await sb.from("inbox")
+        .select("*")
+        .eq("owner_email", mailAddress)
+        .order("received_at", { ascending: false });
+      skeletons.style.display = "none";
+      if (error) {
+        listScroll.innerHTML = `<div class="mail-empty"><div class="mail-empty-icon">⚠️</div><div class="mail-empty-text">Failed to load</div><div class="mail-empty-sub">${esc(error.message)}</div></div>`;
+        return;
+      }
+      allEmails = data || [];
+      updateBadge();
+      applyFilter();
+    }
+
+    function updateBadge() {
+      const n = allEmails.filter(e => e.direction === "in" && !e.read).length;
+      inboxBadge.textContent = n > 99 ? "99+" : n;
+      inboxBadge.style.display = n > 0 ? "flex" : "none";
+    }
+
+    // ── Filter ──
+    function applyFilter() {
+      const q = searchInput.value.trim().toLowerCase();
+      let list = [...allEmails];
+
+      if (currentFolder === "inbox")   list = list.filter(e => e.direction === "in");
+      else if (currentFolder === "sent")    list = list.filter(e => e.direction === "out");
+      else if (currentFolder === "starred") list = list.filter(e => e.starred);
+      else if (currentFolder === "category" && currentCatId) {
+        const senders = (rules[currentCatId] || []).map(s => s.toLowerCase());
+        list = list.filter(e => e.direction === "in" && senders.includes((e.from_addr||"").toLowerCase()));
+      }
+
+      if (q) list = list.filter(e =>
+        (e.subject||"").toLowerCase().includes(q) ||
+        (e.from_addr||"").toLowerCase().includes(q) ||
+        (e.to_addr||"").toLowerCase().includes(q) ||
+        (e.body_text||"").toLowerCase().includes(q)
+      );
+
+      filteredEmails = list;
+      listCount.textContent = list.length;
+      renderList();
+    }
+
+    function renderList() {
+      if (!filteredEmails.length) {
+        const icons = {inbox:"📭",sent:"📤",starred:"⭐",category:"📂"};
+        const msgs  = {inbox:"No messages yet",sent:"No sent messages",starred:"Nothing starred",category:"No messages from these senders"};
+        listScroll.innerHTML = `<div class="mail-empty">
+          <div class="mail-empty-icon">${icons[currentFolder]||"📭"}</div>
+          <div class="mail-empty-text">${msgs[currentFolder]||"Empty"}</div>
+          <div class="mail-empty-sub">${searchInput.value?"Try a different search":""}</div>
+        </div>`;
+        return;
+      }
+      listScroll.innerHTML = filteredEmails.map(e => {
+        const unread  = e.direction==="in" && !e.read;
+        const active  = e.id === selectedId;
+        const display = e.direction==="out" ? (e.to_addr||"") : (e.from_addr||"");
+        const preview = e.body_text || stripHtml(e.body_html||"") || "";
+        return `<div class="mail-item${unread?" unread":""}${active?" active":""}" data-id="${e.id}">
+          <button class="mi-star${e.starred?" starred":""}" data-id="${e.id}">★</button>
+          <div class="mi-row1">
+            <span class="mi-from">${esc(display)}</span>
+            <span class="mi-time">${relTime(e.received_at)}</span>
+          </div>
+          <div class="mi-subject">${esc(e.subject||"(no subject)")}</div>
+          <div class="mi-preview">${esc(preview.slice(0,90))}</div>
+        </div>`;
+      }).join("");
+
+      listScroll.querySelectorAll(".mail-item").forEach(el => {
+        el.addEventListener("click", ev => { if(ev.target.classList.contains("mi-star")) return; openEmail(el.dataset.id); });
+      });
+      listScroll.querySelectorAll(".mi-star").forEach(btn => {
+        btn.addEventListener("click", ev => { ev.stopPropagation(); toggleStar(btn.dataset.id); });
+      });
+    }
+
+    // ── Open email ──
+    async function openEmail(id) {
+      selectedId = id;
+      renderList();
+      const e = allEmails.find(x => x.id === id);
+      if (!e) return;
+      if (!e.read && e.direction === "in") {
+        e.read = true;
+        await sb.from("inbox").update({ read: true }).eq("id", id);
+        updateBadge();
+      }
+      document.getElementById("rdSubject").textContent = e.subject || "(no subject)";
+      const isSent = e.direction === "out";
+      document.getElementById("rdFrom").textContent = isSent ? "To: "+(e.to_addr||"") : "From: "+(e.from_addr||"");
+      document.getElementById("rdAddr").textContent = isSent ? "" : "→ "+(e.to_addr||"");
+      document.getElementById("rdTime").textContent = fmtDate(e.received_at);
+      document.getElementById("rdStar").textContent = e.starred ? "★ Unstar" : "☆ Star";
+      const body = document.getElementById("rdBody");
+      if (e.body_html) body.innerHTML = `<div class="mail-body-html">${e.body_html}</div>`;
+      else if (e.body_text) body.innerHTML = `<pre class="mail-body-plain">${esc(e.body_text)}</pre>`;
+      else body.innerHTML = `<div class="mail-body-plain" style="opacity:.4">No message body.</div>`;
+      noSelect.style.display = "none";
+      readContent.style.display = "flex";
+      rdBack.style.display = window.innerWidth < 900 ? "flex" : "none";
+      if (window.innerWidth < 900) {
+        document.getElementById("mailReadPane").classList.add("show");
+        document.getElementById("mailListPanel").classList.remove("show");
+      }
+      document.getElementById("rdReply").onclick = () => openCompose(e.from_addr||"","Re: "+(e.subject||""));
+      document.getElementById("rdForward").onclick = () => openCompose("","Fwd: "+(e.subject||""),"\n\n--- Forwarded ---\nFrom: "+(e.from_addr||"")+"\n\n"+(e.body_text||stripHtml(e.body_html||"")));
+      document.getElementById("rdStar").onclick = () => toggleStar(id);
+      document.getElementById("rdDelete").onclick = () => triggerDelete(id);
+    }
+
+    function hideReadPane() { noSelect.style.display="flex"; readContent.style.display="none"; }
+
+    rdBack.addEventListener("click", () => {
+      document.getElementById("mailReadPane").classList.remove("show");
+      document.getElementById("mailListPanel").classList.add("show");
+    });
+
+    // ── Star ──
+    async function toggleStar(id) {
+      const e = allEmails.find(x => x.id === id);
+      if (!e) return;
+      e.starred = !e.starred;
+      await sb.from("inbox").update({ starred: e.starred }).eq("id", id);
+      renderList();
+      if (selectedId === id) document.getElementById("rdStar").textContent = e.starred ? "★ Unstar" : "☆ Star";
+      if (currentFolder === "starred") applyFilter();
+    }
+
+    // ── Delete ──
+    function triggerDelete(id) {
+      deleteTarget = id;
+      document.getElementById("confirmOverlay").classList.add("open");
+    }
+    document.getElementById("confirmCancel").onclick = () => { document.getElementById("confirmOverlay").classList.remove("open"); deleteTarget=null; };
+    document.getElementById("confirmDelete").onclick = async () => {
+      if (!deleteTarget) return;
+      await sb.from("inbox").delete().eq("id", deleteTarget);
+      allEmails = allEmails.filter(e => e.id !== deleteTarget);
+      if (selectedId === deleteTarget) { selectedId=null; hideReadPane(); }
+      deleteTarget = null;
+      document.getElementById("confirmOverlay").classList.remove("open");
+      updateBadge(); applyFilter();
+    };
+
+    // ── Search ──
+    function setupSearch() { searchInput.addEventListener("input", applyFilter); }
+
+    // ── Folder clicks ──
+    function setupFolderClicks() {
+      document.querySelectorAll(".folder-item[data-builtin]").forEach(el => {
+        el.addEventListener("click", ev => {
+          if (ev.target.classList.contains("folder-reload-btn")) return;
+          setFolder(el.dataset.folder, null, el.querySelector(".fi-name")?.textContent || el.dataset.folder);
+        });
+      });
+    }
+
+    function setFolder(folder, catId, title) {
+      currentFolder = folder;
+      currentCatId  = catId || null;
+      listTitle.textContent = title;
+      selectedId = null;
+      hideReadPane();
+      document.querySelectorAll(".folder-item").forEach(f => f.classList.remove("active"));
+      const target = catId
+        ? document.querySelector(`.folder-item[data-cat-id="${catId}"]`)
+        : document.querySelector(`.folder-item[data-folder="${folder}"]`);
+      if (target) target.classList.add("active");
+      applyFilter();
+    }
+
+    // ── Reload buttons ──
+    function setupReload() {
+      // per-folder reload in sidebar
+      document.querySelectorAll(".folder-reload-btn").forEach(btn => {
+        btn.addEventListener("click", async ev => {
+          ev.stopPropagation();
+          spinBtn(btn);
+          await loadMail();
+        });
+      });
+      // top-of-list reload
+      document.getElementById("listReloadBtn").addEventListener("click", async () => {
+        spinBtn(document.getElementById("listReloadBtn"));
+        await loadMail();
+      });
+    }
+
+    function spinBtn(btn) {
+      btn.classList.add("spinning");
+      setTimeout(() => btn.classList.remove("spinning"), 500);
+    }
+
+    // ── Realtime ──
+    function setupRealtime() {
+      if (!mailAddress) return;
+      sb.channel("inbox_rt")
+        .on("postgres_changes", { event:"INSERT", schema:"public", table:"inbox", filter:`owner_email=eq.${mailAddress}` }, payload => {
+          allEmails.unshift(payload.new);
+          updateBadge();
+          applyFilter();
+        })
+        .subscribe();
+    }
+
+    // ── Compose ──
+    function setupCompose() {
+      document.getElementById("composeBtn").onclick = () => openCompose();
+      document.getElementById("composeClose").onclick = closeCompose;
+      document.getElementById("cSendBtn").onclick = sendMail;
+    }
+    function openCompose(to="",subject="",body="") {
+      document.getElementById("cTo").value=to;
+      document.getElementById("cSubject").value=subject;
+      document.getElementById("cBody").value=body;
+      document.getElementById("cStatus").textContent="";
+      document.getElementById("cSendBtn").disabled=false;
+      composeModal.classList.add("open");
+      setTimeout(()=>document.getElementById("cTo").focus(),80);
+    }
+    function closeCompose() { composeModal.classList.remove("open"); }
+    async function sendMail() {
+      const to=document.getElementById("cTo").value.trim();
+      const subject=document.getElementById("cSubject").value.trim();
+      const text=document.getElementById("cBody").value.trim();
+      const btn=document.getElementById("cSendBtn");
+      const status=document.getElementById("cStatus");
+      if (!to||!subject||!text) { status.textContent="To, subject, and message required."; status.className="compose-status err"; return; }
+      btn.disabled=true; btn.innerHTML="<span>⏳</span> Sending…"; status.textContent="";
+      try {
+        const { data:{ session } } = await sb.auth.getSession();
+        const res = await fetch(`${SB_URL}/functions/v1/send-email`,{
+          method:"POST",
+          headers:{"Content-Type":"application/json","Authorization":`Bearer ${session.access_token}`,"apikey":SB_ANON},
+          body:JSON.stringify({to,subject,text})
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error?.message||json.error||"Send failed");
+        status.textContent="Sent ✓"; status.className="compose-status ok";
+        btn.innerHTML="<span>✈</span> Send"; btn.disabled=false;
+        setTimeout(closeCompose,1200);
+        await loadMail();
+      } catch(err) {
+        status.textContent=err.message; status.className="compose-status err";
+        btn.innerHTML="<span>✈</span> Send"; btn.disabled=false;
+      }
+    }
+
+    // ── Categories ──
+    async function loadCategories() {
+      if (!mailAddress) return;
+      const { data: cats } = await sb.from("mail_categories").select("*").eq("owner_email", mailAddress).order("created_at");
+      categories = cats || [];
+      if (categories.length > 0) {
+        const { data: ruleRows } = await sb.from("mail_category_rules").select("*").eq("owner_email", mailAddress);
+        rules = {};
+        (ruleRows||[]).forEach(r => {
+          if (!rules[r.category_id]) rules[r.category_id] = [];
+          rules[r.category_id].push(r.sender_email);
+        });
+      }
+      renderCategoryFolders();
+    }
+
+    function renderCategoryFolders() {
+      customList.innerHTML = "";
+      categories.forEach(cat => {
+        const div = document.createElement("div");
+        div.className = "folder-item";
+        div.dataset.catId = cat.id;
+        div.dataset.folder = "category";
+        div.innerHTML = `
+          <span class="fi-icon" style="color:${esc(cat.color)}">●</span>
+          <span class="fi-name">${esc(cat.name)}</span>
+          <button class="folder-reload-btn" title="Reload">↻</button>
+          <button class="folder-del-btn" title="Edit">✎</button>
+        `;
+        div.addEventListener("click", ev => {
+          if (ev.target.classList.contains("folder-del-btn")) { openEditCat(cat.id); return; }
+          if (ev.target.classList.contains("folder-reload-btn")) { spinBtn(ev.target); loadMail(); return; }
+          setFolder("category", cat.id, cat.name);
+        });
+        customList.appendChild(div);
+      });
+
+      // Show "Categories" label only when categories exist
+      const label = document.getElementById("customFolderLabel");
+      label.style.display = categories.length > 0 ? "flex" : "none";
+      if (categories.length > 0) {
+        label.innerHTML = `Categories <button class="folder-add-btn" id="addCategoryBtn2" title="Add category">＋</button>`;
+        document.getElementById("addCategoryBtn2").onclick = openNewCatModal;
+      }
+
+      // Attach reload to any newly rendered reload buttons
+      customList.querySelectorAll(".folder-reload-btn").forEach(btn => {
+        btn.addEventListener("click", async ev => { ev.stopPropagation(); spinBtn(btn); await loadMail(); });
+      });
+    }
+
+    // ── New category modal ──
+    function setupCategoryModals() {
+      document.getElementById("addCategoryBtn").onclick = openNewCatModal;
+      document.getElementById("addCategoryBtnAlt").onclick = openNewCatModal;
+
+      document.getElementById("catModalCancel").onclick = () => document.getElementById("catModal").classList.remove("open");
+      document.getElementById("catModalSave").onclick = saveNewCategory;
+      document.getElementById("ruleAddBtn").onclick = () => addRuleToList(document.getElementById("ruleInput"), newCatRules, "ruleList");
+      document.getElementById("ruleInput").addEventListener("keydown", e => { if (e.key==="Enter") addRuleToList(document.getElementById("ruleInput"),newCatRules,"ruleList"); });
+
+      document.getElementById("catEditCancel").onclick = () => document.getElementById("catEditModal").classList.remove("open");
+      document.getElementById("catEditSave").onclick = saveEditCategory;
+      document.getElementById("catEditDelete").onclick = deleteCategory;
+      document.getElementById("editRuleAddBtn").onclick = () => addRuleToList(document.getElementById("editRuleInput"), editCatRules, "editRuleList");
+      document.getElementById("editRuleInput").addEventListener("keydown", e => { if (e.key==="Enter") addRuleToList(document.getElementById("editRuleInput"),editCatRules,"editRuleList"); });
+    }
+
+    function openNewCatModal() {
+      newCatRules = [];
+      document.getElementById("catName").value = "";
+      document.getElementById("catColor").value = "#6366f1";
+      document.getElementById("ruleList").innerHTML = "";
+      document.getElementById("ruleInput").value = "";
+      document.getElementById("catModal").classList.add("open");
+      setTimeout(() => document.getElementById("catName").focus(), 80);
+    }
+
+    function addRuleToList(input, arr, listId) {
+      const val = input.value.trim().toLowerCase();
+      if (!val || arr.includes(val)) { input.value=""; return; }
+      arr.push(val);
+      input.value = "";
+      renderRuleList(listId, arr, (rem) => { arr.splice(arr.indexOf(rem),1); renderRuleList(listId,arr,(r2)=>{}); });
+    }
+
+    function renderRuleList(listId, arr, onRemove) {
+      const el = document.getElementById(listId);
+      el.innerHTML = arr.map(s => `
+        <div class="rule-item" data-sender="${esc(s)}">
+          <span>${esc(s)}</span>
+          <button class="rule-remove" data-sender="${esc(s)}">✕</button>
+        </div>`).join("");
+      el.querySelectorAll(".rule-remove").forEach(btn => {
+        btn.onclick = () => onRemove(btn.dataset.sender);
+      });
+    }
+
+    async function saveNewCategory() {
+      const name  = document.getElementById("catName").value.trim();
+      const color = document.getElementById("catColor").value;
+      if (!name) return;
+      const { data: cat, error } = await sb.from("mail_categories")
+        .insert({ owner_email: mailAddress, name, color })
+        .select().maybeSingle();
+      if (error || !cat) return;
+      categories.push(cat);
+      rules[cat.id] = [...newCatRules];
+      if (newCatRules.length) {
+        await sb.from("mail_category_rules").insert(
+          newCatRules.map(s => ({ category_id: cat.id, owner_email: mailAddress, sender_email: s }))
+        );
+      }
+      document.getElementById("catModal").classList.remove("open");
+      renderCategoryFolders();
+    }
+
+    function openEditCat(catId) {
+      editCatId = catId;
+      editCatRules = [...(rules[catId] || [])];
+      const cat = categories.find(c => c.id === catId);
+      document.getElementById("catEditName").value = cat.name;
+      document.getElementById("catEditColor").value = cat.color;
+      renderRuleList("editRuleList", editCatRules, rem => { editCatRules.splice(editCatRules.indexOf(rem),1); renderRuleList("editRuleList",editCatRules,()=>{}); });
+      document.getElementById("editRuleInput").value = "";
+      document.getElementById("catEditModal").classList.add("open");
+    }
+
+    async function saveEditCategory() {
+      const name  = document.getElementById("catEditName").value.trim();
+      const color = document.getElementById("catEditColor").value;
+      if (!name || !editCatId) return;
+      await sb.from("mail_categories").update({ name, color }).eq("id", editCatId);
+      // replace rules
+      await sb.from("mail_category_rules").delete().eq("category_id", editCatId);
+      if (editCatRules.length) {
+        await sb.from("mail_category_rules").insert(
+          editCatRules.map(s => ({ category_id: editCatId, owner_email: mailAddress, sender_email: s }))
+        );
+      }
+      const cat = categories.find(c => c.id === editCatId);
+      if (cat) { cat.name = name; cat.color = color; }
+      rules[editCatId] = [...editCatRules];
+      document.getElementById("catEditModal").classList.remove("open");
+      renderCategoryFolders();
+      if (currentCatId === editCatId) { listTitle.textContent = name; applyFilter(); }
+    }
+
+    async function deleteCategory() {
+      if (!editCatId) return;
+      await sb.from("mail_categories").delete().eq("id", editCatId);
+      categories = categories.filter(c => c.id !== editCatId);
+      delete rules[editCatId];
+      document.getElementById("catEditModal").classList.remove("open");
+      if (currentFolder === "category" && currentCatId === editCatId) setFolder("inbox", null, "Inbox");
+      renderCategoryFolders();
+    }
+
+    // ── Utils ──
+    function esc(s){ return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+    function stripHtml(h){ const d=document.createElement("div"); d.innerHTML=h; return d.textContent||d.innerText||""; }
+    function relTime(ts){
+      const d=Math.floor((Date.now()-new Date(ts).getTime())/1000);
+      if(d<60) return "just now";
+      if(d<3600) return Math.floor(d/60)+"m ago";
+      if(d<86400) return Math.floor(d/3600)+"h ago";
+      if(d<604800) return Math.floor(d/86400)+"d ago";
+      return new Date(ts).toLocaleDateString(undefined,{month:"short",day:"numeric"});
+    }
+    function fmtDate(ts){ return new Date(ts).toLocaleString(undefined,{month:"short",day:"numeric",year:"numeric",hour:"numeric",minute:"2-digit"}); }
+  })();
+  </script>
+</body>
+</html>
